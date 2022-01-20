@@ -1,24 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>User Interface Mock-Up</title>
-    <link rel = "stylesheet" type="text/css" href="styles.css">
 
+<style>
+* {
+    box-sizing: border-box;
+}
+
+nav {
+    float: left;
+    width: 49%;
+    height: 600px;
+    padding: 20px;
+    border: solid 1px;
+}
+
+article1 {
+    float: right;
+    padding: 20px;
+    width: 49%;
+    border: solid 1px;
+    height: 295px;
+}
+
+article2 {
+    float: left;
+    margin-top: 10px;
+    margin-left: 2%;
+    padding: 20px;
+    width: 30%;
+    border: solid 1px;
+    height: 295px; /* only for demonstration, should be removed */
+}
+
+</style>
 </head>
 
 <body>
     <h1><center>User Interface Mock-Up</center></h1>
-    <div class="box-wrapper">
-        <div id="box">
-          <div id="box1">Map</div>
-          <div class="right-side"> 
-            <div id="box2">Street View</div>
-            <div id="box3">Additional Information</div>
-          </div> 
-        </div>
-    </div>
+    <section>
+        <nav>
+            <p>Map</p>
+        </nav>
+
+        <article1>
+            <p>Street View</p>
+        </article1>
+    
+        <article2>
+            <p>Additional Information</p>
+        </article2>
+    </section>
 </body>
 
 </html>
-
