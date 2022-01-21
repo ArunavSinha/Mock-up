@@ -22,13 +22,11 @@ box {
     float: left;
     width: 49%;
     height: 600px;
-    padding: 10px;
     border: solid 1px;
 }
 
 article1 {
     float: right;
-    padding: 10px;
     width: 49%;
     border: solid 1px;
     height: 295px;
@@ -38,7 +36,6 @@ article2 {
     float: left;
     margin-top: 10px;
     margin-left: 2%;
-    padding: 10px;
     width: 30%;
     border: solid 1px;
     height: 295px; 
@@ -47,7 +44,6 @@ article2 {
 article3 {
     float: right;
     margin-top: 10px;
-    padding: 10px;
     width: 18%;
     height: 295px; 
 }
@@ -63,6 +59,12 @@ div.buttonBlock button {
     margin-top: 10px;
 }
 
+.myDiv {
+    text-align: center;
+    overflow-wrap: break-word;
+    font-size: 20px
+}
+
 </style>
 </head>
 
@@ -70,22 +72,25 @@ div.buttonBlock button {
     <h1 style="text-align: center;">User Interface Mock-Up</h1>
     <section>
         <box>
-            <p>Satellite View</p>
-            <iframe width="100%" height="94%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/view?zoom=17&center=45.4220%2C-75.7056&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></iframe>
+            <p><strong>Satellite View</strong></p>
+            <iframe width="100%" height="93%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/view?zoom=17&center=45.4220%2C-75.7056&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></iframe>
         </box>
 
         <article1>
-            <p>Street View</p>
-            <iframe width="100%" height="235px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?location=45.4220%2C-75.7056&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></iframe>
+            <p><strong>Street View</strong></p>
+            <iframe width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?location=45.4220%2C-75.7056&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></iframe>
         </article1>
     
         <article2>
-            <p>Additional Information</p>
+            <p><strong>Additional Information</strong></p>
         </article2>
 
         <article3>
-            <p>Viewing Address</p>
-            <p style="line-height: 1;">1/50</p>
+            <p><strong>Current Address:</strong></p>
+            <div class="myDiv">
+                301 Wellington St, Ottawa, ON K1A 0J1
+            </div>
+            <p style="line-height: 0.5;">1/50</p>
 
             <div class = "buttonBlock">
                 <button id = "load"; onclick="alert('Upload list of addresses (coming soon)')">Load</button>
