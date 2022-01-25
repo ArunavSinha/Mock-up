@@ -4,66 +4,71 @@
     <title>User Interface Mock-Up</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+    * {
+        box-sizing: border-box;
+    }
 
-p {
-    font-size: 20px; 
-    line-height: 0;
-    text-align: center;
-}
+    p {
+        font-size: 20px; 
+        line-height: 0;
+        text-align: center;
+    }
 
-h1 {
-    margin-bottom: 40px;
-}
+    h1 {
+        margin-bottom: 30px;
+    }
 
-box {
-    float: left;
-    width: 49%;
-    height: 600px;
-    border: solid 1px;
-}
+    box {
+        float: left;
+        width: 49%;
+        height: 600px;
+        border: solid 1px;
+    }
 
-article1 {
-    float: right;
-    width: 49%;
-    border: solid 1px;
-    height: 295px;
-}
+    article1 {
+        float: right;
+        width: 49%;
+        border: solid 1px;
+        height: 295px;
+    }
 
-article2 {
-    float: left;
-    margin-top: 10px;
-    margin-left: 2%;
-    width: 30%;
-    border: solid 1px;
-    height: 295px; 
-}
+    article2 {
+        float: left;
+        margin-top: 10px;
+        margin-left: 2%;
+        width: 30%;
+        border: solid 1px;
+        height: 295px; 
+    }
 
-article3 {
-    float: right;
-    margin-top: 10px;
-    width: 18%;
-    height: 295px; 
-}
+    article3 {
+        float: right;
+        margin-top: 10px;
+        width: 18%;
+        height: 295px; 
+    }
 
-div.buttonBlock {text-align: center;}
+    input.ChooseSubmit {
+        font-size: 16px; 
+        cursor: pointer;
+    }
 
-div.buttonBlock button {
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 16px;
-    cursor: pointer;
-    vertical-align: middle;
-    margin-top: 10px;
-}
+    div.buttonBlock {text-align: center;}
 
-.myDiv {
-    text-align: center;
-    overflow-wrap: break-word;
-    font-size: 20px;
-}
+    div.buttonBlock button {
+        padding: 10px 20px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 5px;
+    }
+
+    .myDiv {
+        text-align: center;
+        overflow-wrap: break-word;
+        font-size: 20px;
+    }
 
 </style>
 </head>
@@ -90,21 +95,59 @@ div.buttonBlock button {
             <div class="myDiv">
                 301 Wellington St, Ottawa, ON K1A 0J1
             </div>
-            <p style="line-height: 0.5;">1/50</p>
+            <p style="line-height: 0.5;">1/1</p>
 
-            <div class = "buttonBlock">
-                <button id = "load"; onclick="alert('Upload list of addresses (coming soon)')">Load</button>
-            </div>
-            <div class = "buttonBlock">
-                <button id = "next"; onclick="alert('Navigate to next address (coming soon)')">Next</button>
-            </div>
+            <form id="myForm">
+                <fieldset style="border: 0px; transform: translateX(8%);">
+                    <input type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
+                    <input type="submit" value="Load Addresses" class="ChooseSubmit" onclick="loadFile();" style="margin-top: 10px; margin-bottom: 10px;">
+                </fieldset>
+            </form>
+
             <div class = "buttonBlock">
                 <button id = "previous"; onclick="alert('Navigate to previous address (coming soon)')">Previous</button>
+                <button id = "next"; onclick="alert('Navigate to next address (coming soon)')">Next</button>
             </div>
         </article3>
-
-
     </section>
-</body>
 
+    <script>
+        function loadFile(){
+            var myForm = document.getElementById("myForm");
+            var csvFile = document.getElementById("csvFile");
+
+            if (!csvFile.files[0]) {
+                alert("Please choose a file before clicking 'Load Addresses'");
+            }
+        
+            function csvToArray(str) {
+                var headers = str.slice(0, str.indexOf("\n")).split(",");
+                var rows = str.slice(str.indexOf("\n") + 1).split("\n");
+                var arr = rows.map(function (row) {
+                    var values = row.split(",");
+                    var reduced = headers.reduce(function (object, header, index) {
+                        object[header] = values[index];
+                        return object;
+                    }, {});
+                    return reduced;
+                });
+                return arr.slice(0, -1);
+            }
+        
+            myForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var input = csvFile.files[0];
+                var reader = new FileReader();
+        
+                reader.onload = function (e) {
+                    var text = e.target.result;
+                    var data = csvToArray(text);
+                    console.log(JSON.stringify(data));
+                };
+                reader.readAsText(input);
+            });
+        }
+    </script>
+
+</body>
 </html>
