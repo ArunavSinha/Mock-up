@@ -105,22 +105,26 @@
             </form>
 
             <div class = "buttonBlock">
-                <button id = "previous"; onclick="alert('Navigate to previous address (coming soon)')">Previous</button>
-                <button id = "next"; onclick="alert('Navigate to next address (coming soon)')">Next</button>
+                <button id = "previous"; onclick="previous();">Previous</button>
+                <button id = "next"; onclick="next();">Next</button>
             </div>
         </article3>
     </section>
 
     <script>
+        var numAddresses = 1;
+        var currentAddress = 1;
+        var myForm, csvFile, data;
+        
         function loadFile(){
-            var numAddresses = 1;
-            var currentAddress = 1;
-
-            var myForm = document.getElementById("myForm");
-            var csvFile = document.getElementById("csvFile");
-
+            myForm = document.getElementById("myForm");
+            csvFile = document.getElementById("csvFile");
             if (!csvFile.files[0]) {
                 alert("Please choose a file before clicking 'Load Addresses'");
+            }
+            else if (csvFile.files[0].name.split(".").pop() !== "csv"){
+                csvFile = null;
+                alert("The file must be of type 'csv'");
             }
 
             function csvToArray(allText) {
@@ -146,7 +150,7 @@
         
                 reader.onload = function (e) {
                     var text = e.target.result;
-                    var data = csvToArray(text);
+                    data = csvToArray(text);
                     numAddresses = data.length;
                     document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
                     document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
@@ -154,6 +158,32 @@
                 };
                 reader.readAsText(input);
             });
+        }
+
+        function next(){
+            if (!csvFile.files[0]) {
+                alert("Please choose a file before clicking 'Next'");
+            }
+            if (currentAddress < numAddresses){
+                currentAddress++;
+            }
+            document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
+            document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
+        }
+
+        function previous(){
+            if (!csvFile.files[0]) {
+                alert("Please choose a file before clicking 'Previous'");
+            }
+            if (currentAddress > 1){
+                currentAddress--;
+            }
+            document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
+            document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
+        }
+
+        function updateMap(){
+            
         }
     </script>
 
