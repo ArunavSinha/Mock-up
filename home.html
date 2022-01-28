@@ -116,10 +116,8 @@
 
     <script>
         var numAddresses = 1;
-        var current = 1;
-        var myForm, csvFile, data;
-        var currentAddress;
-        var lat, long;
+        var position = 1;
+        var myForm, csvFile, data, currentAddress, lat, long;
         
         function loadFile(){
             myForm = document.getElementById("myForm");
@@ -157,9 +155,8 @@
                     var text = e.target.result;
                     data = csvToArray(text);
                     numAddresses = data.length;
-                    document.getElementById("position").innerHTML = current + "/" + numAddresses;
-                    currentAddress = data[current-1];
-                    JSON.stringify(data[current-1]).replace(/"/g,"");
+                    document.getElementById("position").innerHTML = position + "/" + numAddresses;
+                    currentAddress = data[position-1];
                     document.getElementById("current").innerHTML = currentAddress;
                     console.log(JSON.stringify(data));
                     addressToCoordinates(currentAddress);
@@ -172,12 +169,12 @@
             if (!csvFile.files[0]) {
                 alert("Please choose a file before clicking 'Next'");
             }
-            if (current < numAddresses){
-                current++;
-                currentAddress = data[current-1];
+            if (position < numAddresses){
+                position++;
+                currentAddress = data[position-1];
             }
-            document.getElementById("position").innerHTML = current + "/" + numAddresses;
-            document.getElementById("current").innerHTML = JSON.stringify(data[current-1]).replace(/"/g,"");
+            document.getElementById("position").innerHTML = position + "/" + numAddresses;
+            document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
             addressToCoordinates(currentAddress);
             updateMap();
         }
@@ -186,12 +183,12 @@
             if (!csvFile.files[0]) {
                 alert("Please choose a file before clicking 'Previous'");
             }
-            if (current > 1){
-                current--;
-                currentAddress = data[current-1];
+            if (position > 1){
+                position--;
+                currentAddress = data[position-1];
             }
-            document.getElementById("position").innerHTML = current + "/" + numAddresses;
-            document.getElementById("current").innerHTML = JSON.stringify(data[current-1]).replace(/"/g,"");
+            document.getElementById("position").innerHTML = position + "/" + numAddresses;
+            document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
             addressToCoordinates(currentAddress);
             updateMap();
         }
