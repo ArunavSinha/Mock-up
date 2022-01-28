@@ -81,12 +81,12 @@
     <section>
         <box>
             <p><strong>Satellite View</strong></p>
-            <iframe width="100%" height="93.3%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
+            <iframe id="satellite" width="100%" height="93.3%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
         </box>
 
         <article1>
             <p><strong>Street View</strong></p>
-            <iframe width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
+            <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
         </article1>
     
         <article2>
@@ -103,7 +103,7 @@
             <form id="myForm">
                 <fieldset style="border: 0px; transform: translateX(8%);">
                     <input type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
-                    <input type="submit" value="Load Addresses" class="ChooseSubmit" onclick="loadFile();" style="margin-top: 10px; margin-bottom: 10px;">
+                    <input id="my-link" type="submit" value="Load Address" class="ChooseSubmit" onclick="loadFile();" style="margin-top: 10px; margin-bottom: 10px;">
                 </fieldset>
             </form>
 
@@ -117,7 +117,7 @@
     <script>
         var numAddresses = 1;
         var position = 1;
-        var myForm, csvFile, data, currentAddress, lat, long;
+        var myForm, csvFile, data, currentAddress, lat, long, placeID;
         
         function loadFile(){
             myForm = document.getElementById("myForm");
@@ -158,10 +158,9 @@
                     document.getElementById("position").innerHTML = position + "/" + numAddresses;
                     currentAddress = data[position-1];
                     document.getElementById("current").innerHTML = currentAddress;
-                    console.log(JSON.stringify(data));
-                    addressToCoordinates(currentAddress);
                 };
                 reader.readAsText(input);
+                updateMap();
             });
         }
 
@@ -175,7 +174,7 @@
             }
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
             document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
-            addressToCoordinates(currentAddress);
+            updateMap();
             updateMap();
         }
 
@@ -189,7 +188,6 @@
             }
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
             document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
-            addressToCoordinates(currentAddress);
             updateMap();
         }
 
@@ -202,19 +200,29 @@
             })
             .then(function(response){
                 lat = response.data.results[0].geometry.location.lat;
-                long = response.data.results[0].geometry.location.lng;
-                console.log("Current address: " + currentAddress);
-                console.log("Latitude: " + lat);
-                console.log("Longitude: " + long);      
+                long = response.data.results[0].geometry.location.lng;  
+                placeID = response.data.results[0].place_id;
             })
             .catch(function(error){
                 console.log(error);
             });
         }
 
-        function updateMap(){
+        // Attempt 1: Modifying URL 
+        // function updateMap(){
+        //     addressToCoordinates(currentAddress);
+        //     var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
+        //     document.getElementById("satellite").src = newSatellite;
+        //     var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
+        //     document.getElementById("street").src = newStreet;
+        // }
 
+        // Attempt 2: Using Maps JavaScript API
+        function updateMap(){
+            
         }
+
+
     </script>
 
 </body>
