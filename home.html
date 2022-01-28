@@ -209,13 +209,13 @@
         }
 
         // Attempt 1: Modifying URL 
-        // function updateMap(){
-        //     addressToCoordinates(currentAddress);
-        //     var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
-        //     document.getElementById("satellite").src = newSatellite;
-        //     var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
-        //     document.getElementById("street").src = newStreet;
-        // }
+        function updateMap(){
+            addressToCoordinates(currentAddress);
+            var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
+            document.getElementById("satellite").src = newSatellite;
+            var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
+            document.getElementById("street").src = newStreet;
+        }
 
         // Attempt 2: Using Maps JavaScript API
         function updateMap(){
