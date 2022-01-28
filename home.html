@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <title>User Interface Mock-Up</title>
 
     <style>
@@ -78,7 +81,7 @@
     <section>
         <box>
             <p><strong>Satellite View</strong></p>
-            <iframe width="100%" height="93%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></iframe>
+            <iframe width="100%" height="93.3%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
         </box>
 
         <article1>
@@ -92,7 +95,7 @@
 
         <article3>
             <p><strong>Current Address:</strong></p>
-            <div id="currentAddress" class="myDiv">
+            <div id="current" class="myDiv">
                 301 Wellington St, Ottawa, ON K1A 0J1
             </div>
             <p id="position" style="line-height: 0.5;">1/1</p>
@@ -113,8 +116,10 @@
 
     <script>
         var numAddresses = 1;
-        var currentAddress = 1;
+        var current = 1;
         var myForm, csvFile, data;
+        var currentAddress;
+        var lat, long;
         
         function loadFile(){
             myForm = document.getElementById("myForm");
@@ -152,9 +157,12 @@
                     var text = e.target.result;
                     data = csvToArray(text);
                     numAddresses = data.length;
-                    document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
-                    document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
+                    document.getElementById("position").innerHTML = current + "/" + numAddresses;
+                    currentAddress = data[current-1];
+                    JSON.stringify(data[current-1]).replace(/"/g,"");
+                    document.getElementById("current").innerHTML = currentAddress;
                     console.log(JSON.stringify(data));
+                    addressToCoordinates(currentAddress);
                 };
                 reader.readAsText(input);
             });
@@ -164,26 +172,51 @@
             if (!csvFile.files[0]) {
                 alert("Please choose a file before clicking 'Next'");
             }
-            if (currentAddress < numAddresses){
-                currentAddress++;
+            if (current < numAddresses){
+                current++;
+                currentAddress = data[current-1];
             }
-            document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
-            document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
+            document.getElementById("position").innerHTML = current + "/" + numAddresses;
+            document.getElementById("current").innerHTML = JSON.stringify(data[current-1]).replace(/"/g,"");
+            addressToCoordinates(currentAddress);
+            updateMap();
         }
 
         function previous(){
             if (!csvFile.files[0]) {
                 alert("Please choose a file before clicking 'Previous'");
             }
-            if (currentAddress > 1){
-                currentAddress--;
+            if (current > 1){
+                current--;
+                currentAddress = data[current-1];
             }
-            document.getElementById("position").innerHTML = currentAddress + "/" + numAddresses;
-            document.getElementById("currentAddress").innerHTML = JSON.stringify(data[currentAddress-1]).replace(/"/g,"");
+            document.getElementById("position").innerHTML = current + "/" + numAddresses;
+            document.getElementById("current").innerHTML = JSON.stringify(data[current-1]).replace(/"/g,"");
+            addressToCoordinates(currentAddress);
+            updateMap();
+        }
+
+        function addressToCoordinates(location){
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+                params:{
+                    address:location,
+                    key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
+                }
+            })
+            .then(function(response){
+                lat = response.data.results[0].geometry.location.lat;
+                long = response.data.results[0].geometry.location.lng;
+                console.log("Current address: " + currentAddress);
+                console.log("Latitude: " + lat);
+                console.log("Longitude: " + long);      
+            })
+            .catch(function(error){
+                console.log(error);
+            });
         }
 
         function updateMap(){
-            
+
         }
     </script>
 
