@@ -117,6 +117,7 @@
     <script>
         var numAddresses = 1;
         var position = 1;
+        var counter = 1;
         var myForm, csvFile, data, currentAddress, lat, long, placeID;
         
         function loadFile(){
@@ -157,10 +158,11 @@
                     numAddresses = data.length;
                     document.getElementById("position").innerHTML = position + "/" + numAddresses;
                     currentAddress = data[position-1];
+                    console.log("First Current Address: " + currentAddress);
                     document.getElementById("current").innerHTML = currentAddress;
+                    updateMap(currentAddress);
                 };
                 reader.readAsText(input);
-                updateMap();
             });
         }
 
@@ -192,25 +194,41 @@
         }
 
         function addressToCoordinates(location){
-            axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+            console.log("location: " + location);
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json',{ // use fetch
                 params:{
                     address:location,
                     key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
                 }
             })
             .then(function(response){
-                lat = response.data.results[0].geometry.location.lat;
-                long = response.data.results[0].geometry.location.lng;  
-                placeID = response.data.results[0].place_id;
+                let lat = response.data.results[0].geometry.location.lat;
+                let long = response.data.results[0].geometry.location.lng;  
+                let placeID = response.data.results[0].place_id;
+                let arr = ["43.872344", "79.29276709999999", "ChIJVUbl1tjV1IkRd6sKsfO2nFs"];  
+                console.log("returning");
+                return {arr};
             })
             .catch(function(error){
-                console.log(error);
+                console.log(error.response);
+                // if (error.response === 400){
+                //     while (counter < 40){
+                //         console.log("got here: " + counter);
+                //         addressToCoordinates(location);
+                //     }
+                // }
+                // else {
+                //     console.log("Over 40 tries: " + error);
+                // }             
             });
         }
 
         // Attempt 1: Modifying URL 
-        function updateMap(){
-            addressToCoordinates(currentAddress);
+        function updateMap(location){
+            let output = addressToCoordinates(location);
+            console.log(output);
+            // let {lat, long, placeID} = addressToCoordinates(location);
+            // console.log("lat: " + lat + " long: " + long + " placeID: " + placeID);
             var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
             document.getElementById("satellite").src = newSatellite;
             var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
