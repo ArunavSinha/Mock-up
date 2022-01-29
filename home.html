@@ -177,7 +177,6 @@
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
             document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
             updateMap();
-            updateMap();
         }
 
         function previous(){
@@ -194,33 +193,27 @@
         }
 
         function addressToCoordinates(location){
+            let arr2 = [];
             console.log("location: " + location);
+
             axios.get('https://maps.googleapis.com/maps/api/geocode/json',{ // use fetch
                 params:{
                     address:location,
                     key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
                 }
             })
-            .then(function(response){
-                let lat = response.data.results[0].geometry.location.lat;
-                let long = response.data.results[0].geometry.location.lng;  
-                let placeID = response.data.results[0].place_id;
-                let arr = ["43.872344", "79.29276709999999", "ChIJVUbl1tjV1IkRd6sKsfO2nFs"];  
+            .then(arr2 = function(response){
+                // let lat = response.data.results[0].geometry.location.lat;
+                // let long = response.data.results[0].geometry.location.lng;  
+                // let placeID = response.data.results[0].place_id;
+                arr = ["43.872344", "79.29276709999999", "ChIJVUbl1tjV1IkRd6sKsfO2nFs"];  
                 console.log("returning");
-                return {arr};
-            })
+                return arr;
+            }()) 
             .catch(function(error){
-                console.log(error.response);
-                // if (error.response === 400){
-                //     while (counter < 40){
-                //         console.log("got here: " + counter);
-                //         addressToCoordinates(location);
-                //     }
-                // }
-                // else {
-                //     console.log("Over 40 tries: " + error);
-                // }             
+                console.log(error.response);   
             });
+            return arr2;
         }
 
         // Attempt 1: Modifying URL 
