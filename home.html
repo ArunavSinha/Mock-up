@@ -206,8 +206,6 @@
  
         function updateMap(location){
             addressToCoordinates(location).then((response)=>{
-                console.log(response);
-
                 let lat = response.data.results[0].geometry.location.lat;
                 let long = response.data.results[0].geometry.location.lng;
                 let placeID = response.data.results[0].place_id;
