@@ -18,40 +18,63 @@
         }
 
         h1 {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
+
+        .row{
+            display: flex;
+            width: 100%;
+        }
+
+        .row div {
+            width: 50%;
+        }
+
+        .Margin {
+            margin: 0px;
+        }
+
 
         /* Satellite View */
-        box { 
+        article1 { 
             float: left;
-            width: 49%;
-            height: 500px;
+            width: 98%;
+            height: 450px;
             border: solid 1px;
-        }
-
-        /* Street View */
-        article1 {
-            float: right;
-            width: 49%;
-            border: solid 1px;
-            height: 295px;
         }
 
         /* Additional Information */
         article2 {
             float: left;
             margin-top: 10px;
-            margin-left: 2%;
-            width: 30%;
+            width: 98%;
+            height: 150px;
             border: solid 1px;
-            height: 195px; 
+        }
+
+        /* Street View */
+        article3 {
+            float: right;
+            width: 98%;
+            height: 295px;
+            border: solid 1px;
+        }
+
+        /* Map View */
+        article4 {
+            float: left;
+            margin-left: 2%;
+            margin-top: -145px;
+            width: 60%;
+            height: 305px; 
+            border: solid 1px;
         }
 
         /* Current Address and Buttons */
-        article3 {
+        article5 {
+            margin-top: -305px; 
             float: right;
-            margin-top: 10px;
-            width: 18%;
+            width: 60%;
             height: 295px; 
         }
 
@@ -59,22 +82,22 @@
             font-size: 16px; 
             cursor: pointer;
         }
+        .myDiv {
+            margin-left: 200px;
+            text-align: center;
+            overflow-wrap: break-word;
+            font-size: 20px;
+        }
 
-        div.buttonBlock {text-align: center;}
-
-        div.buttonBlock button {
+        .inline {
             padding: 10px 20px;
             text-align: center;
             font-size: 16px;
             cursor: pointer;
             vertical-align: middle;
-            margin: 5px;
-        }
-
-        .myDiv {
-            text-align: center;
-            overflow-wrap: break-word;
-            font-size: 20px;
+            display: inline-block;
+            margin-right: 10px;
+            margin-top: 10px;
         }
 
     </style>
@@ -83,38 +106,52 @@
 <body>
     <h1 style="text-align: center;">User Interface Mock-Up</h1>
     <section>
-        <box>
-            <p><strong>Satellite View</strong></p>
-            <iframe id="satellite" width="100%" height="92%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
-        </box>
 
-        <article1>
-            <p><strong>Street View</strong></p>
-            <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
-        </article1>
-    
-        <article2>
-            <p><strong>Additional Information</strong></p>
-        </article2>
-
-        <article3>
-            <p><strong>Current Address:</strong></p>
-            <div id="current" class="myDiv">
-                301 Wellington St, Ottawa, ON K1A 0J1
+        <div class="row 1"> 
+            <div>
+                <article1>
+                    <p><strong>Satellite View</strong></p>
+                    <iframe id="satellite" width="100%" height="91.1%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
+                </article1>
             </div>
-            <p id="position" style="line-height: 0.5;">1/1</p>
-
-            <form id="myForm">
-                <fieldset style="border: 0px; transform: translateX(8%);">
-                    <input id="choose" type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
-                </fieldset>
-            </form>
-
-            <div class = "buttonBlock">
-                <button id = "previous"; onclick="previous();">Previous</button>
-                <button id = "next"; onclick="next();">Next</button>
+            <div>
+                <article3>
+                    <p><strong>Street View</strong></p>
+                    <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
+                </article3>
+                
             </div>
-        </article3>
+        </div>
+
+        <div class="row 2">
+            <div>
+                <article2>
+                    <p><strong>Additional Information</strong></p>
+                </article2>
+            </div>
+            <div>
+                <article4>
+                    <p><strong>Map View</strong></p>
+                    <iframe id="map" width="99.9%" height="87%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18"></iframe>
+                </article4>
+                <article5>
+                    <p style="margin-left: 170px"><strong>Current Address</strong></p>
+                    <div id="current" class="myDiv">
+                        301 Wellington St, Ottawa, ON K1A 0J1
+                    </div>
+                    <p id="position" style="line-height: 1.2; margin-left: 170px">1/1</p>
+        
+                    <form id="myForm">
+                        <fieldset style="border: 0px; transform: translateX(8%);">
+                            <input style="margin-left:170px; margin-top: 10px;" id="choose" type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
+                        </fieldset>
+                    </form>
+        
+                    <button style="margin-left:220px" class="inline" id="previous" onclick="previous();">Previous</button>
+                    <button class="inline" id="next" onclick="next();">Next</button>
+                </article5>
+            </div>
+        </div>
     </section>
 
     <script>
@@ -122,13 +159,11 @@
         var position = 1;
         var counter = 1;
         var data, currentAddress, lat, long, placeID;
-        
         var csvFile = document.getElementsByTagName('input')[0];
-
+        
         csvFile.onclick = function(){
             this.value = null;
         };
-        
         csvFile.onchange = function(){
             loadFile();
         };
@@ -221,6 +256,8 @@
                 document.getElementById("satellite").src = newSatellite;
                 var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
                 document.getElementById("street").src = newStreet;
+                var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
+                document.getElementById("map").src = newMap; 
             })
         }
 
