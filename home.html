@@ -157,10 +157,7 @@
                     data = csvToArray(text);
                     numAddresses = data.length;
                     document.getElementById("position").innerHTML = position + "/" + numAddresses;
-                    currentAddress = data[position-1];
-                    console.log("First Current Address: " + currentAddress);
-                    document.getElementById("current").innerHTML = currentAddress;
-                    updateMap(currentAddress);
+                    updateMap(returnAddress(position));
                 };
                 reader.readAsText(input);
             });
@@ -176,7 +173,7 @@
             }
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
             document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
-            updateMap();
+            updateMap(returnAddress(position));
         }
 
         function previous(){
@@ -189,51 +186,44 @@
             }
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
             document.getElementById("current").innerHTML = JSON.stringify(data[position-1]).replace(/"/g,"");
-            updateMap();
+            updateMap(returnAddress(position));
         }
 
         function addressToCoordinates(location){
-            let arr2 = [];
-            console.log("location: " + location);
-
-            axios.get('https://maps.googleapis.com/maps/api/geocode/json',{ // use fetch
-                params:{
-                    address:location,
-                    key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
-                }
-            })
-            .then(arr2 = function(response){
-                // let lat = response.data.results[0].geometry.location.lat;
-                // let long = response.data.results[0].geometry.location.lng;  
-                // let placeID = response.data.results[0].place_id;
-                arr = ["43.872344", "79.29276709999999", "ChIJVUbl1tjV1IkRd6sKsfO2nFs"];  
-                console.log("returning");
-                return arr;
-            }()) 
-            .catch(function(error){
-                console.log(error.response);   
-            });
-            return arr2;
+            try {
+                const promise = axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+                    params:{
+                        address:location,
+                        key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
+                    }
+                })
+                 return promise;
+            }
+            catch (error) {
+                console.log(error);
+            }
         }
-
-        // Attempt 1: Modifying URL 
+ 
         function updateMap(location){
-            let output = addressToCoordinates(location);
-            console.log(output);
-            // let {lat, long, placeID} = addressToCoordinates(location);
-            // console.log("lat: " + lat + " long: " + long + " placeID: " + placeID);
-            var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
-            document.getElementById("satellite").src = newSatellite;
-            var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
-            document.getElementById("street").src = newStreet;
+            addressToCoordinates(location).then((response)=>{
+                console.log(response);
+
+                let lat = response.data.results[0].geometry.location.lat;
+                let long = response.data.results[0].geometry.location.lng;
+                let placeID = response.data.results[0].place_id;
+ 
+                var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
+                document.getElementById("satellite").src = newSatellite;
+                var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
+                document.getElementById("street").src = newStreet;
+            })
         }
 
-        // Attempt 2: Using Maps JavaScript API
-        // function updateMap(){
-            
-        // }
-
-
+        function returnAddress(position){
+            currentAddress = data[position-1];
+            document.getElementById("current").innerHTML = currentAddress;
+            return currentAddress;
+        }
     </script>
 
 </body>
