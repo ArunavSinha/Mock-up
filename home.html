@@ -21,13 +21,15 @@
             margin-bottom: 30px;
         }
 
-        box {
+        /* Satellite View */
+        box { 
             float: left;
             width: 49%;
-            height: 600px;
+            height: 500px;
             border: solid 1px;
         }
 
+        /* Street View */
         article1 {
             float: right;
             width: 49%;
@@ -35,15 +37,17 @@
             height: 295px;
         }
 
+        /* Additional Information */
         article2 {
             float: left;
             margin-top: 10px;
             margin-left: 2%;
             width: 30%;
             border: solid 1px;
-            height: 295px; 
+            height: 195px; 
         }
 
+        /* Current Address and Buttons */
         article3 {
             float: right;
             margin-top: 10px;
@@ -81,7 +85,7 @@
     <section>
         <box>
             <p><strong>Satellite View</strong></p>
-            <iframe id="satellite" width="100%" height="93.3%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
+            <iframe id="satellite" width="100%" height="92%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
         </box>
 
         <article1>
@@ -102,8 +106,7 @@
 
             <form id="myForm">
                 <fieldset style="border: 0px; transform: translateX(8%);">
-                    <input type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
-                    <input id="my-link" type="submit" value="Load Address" class="ChooseSubmit" onclick="loadFile();" style="margin-top: 10px; margin-bottom: 10px;">
+                    <input id="choose" type='file' id='csvFile' accept=".csv" class="ChooseSubmit">
                 </fieldset>
             </form>
 
@@ -118,24 +121,31 @@
         var numAddresses = 1;
         var position = 1;
         var counter = 1;
-        var myForm, csvFile, data, currentAddress, lat, long, placeID;
+        var data, currentAddress, lat, long, placeID;
         
+        var csvFile = document.getElementsByTagName('input')[0];
+
+        csvFile.onclick = function(){
+            this.value = null;
+        };
+        
+        csvFile.onchange = function(){
+            loadFile();
+        };
+
         function loadFile(){
-            myForm = document.getElementById("myForm");
-            csvFile = document.getElementById("csvFile");
             if (!csvFile.files[0]) {
-                alert("Please choose a file before clicking 'Load Addresses'");
+                alert("Please select a file");
             }
             else if (csvFile.files[0].name.split(".").pop() !== "csv"){
                 csvFile = null;
                 alert("The file must be of type 'csv'");
-            }
+            }  
 
             function csvToArray(allText) {
                 var allTextLines = allText.split(/\r\n|\n/);
                 var headers = allTextLines[0].split(',');
                 var lines = [];
-
                 for (var i=1; i<allTextLines.length; i++) {
                     var data = allTextLines[i].split(',');
                     if (data.length == headers.length) {
@@ -147,20 +157,17 @@
                 return lines.slice(0, -1);
             }
         
-            myForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                var input = csvFile.files[0];
-                var reader = new FileReader();
-        
-                reader.onload = function (e) {
-                    var text = e.target.result;
-                    data = csvToArray(text);
-                    numAddresses = data.length;
-                    document.getElementById("position").innerHTML = position + "/" + numAddresses;
-                    updateMap(returnAddress(position));
-                };
-                reader.readAsText(input);
-            });
+            var input = csvFile.files[0];
+            var reader = new FileReader();
+    
+            reader.onload = function (e) {
+                var text = e.target.result;
+                data = csvToArray(text);
+                numAddresses = data.length;
+                document.getElementById("position").innerHTML = position + "/" + numAddresses;
+                updateMap(returnAddress(position));
+            };
+            reader.readAsText(input);
         }
 
         function next(){
