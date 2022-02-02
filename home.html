@@ -4,6 +4,7 @@
 <head>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></script>
     <title>User Interface Mock-Up</title>
 
     <style>
@@ -21,7 +22,7 @@
             margin-bottom: 25px;
         }
 
-        .row{
+        .row {
             display: flex;
             width: 100%;
         }
@@ -100,6 +101,10 @@
             margin-top: 10px;
         }
 
+        #map * {
+            overflow: visible;
+        }
+
     </style>
 </head>
 
@@ -117,7 +122,8 @@
             <div>
                 <article3>
                     <p><strong>Street View</strong></p>
-                    <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
+                    <!-- <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe> -->
+                    <div id="street" style="width: 100%; height: 253px; border:0; overflow: visible" ></div>
                 </article3>
                 
             </div>
@@ -169,7 +175,7 @@
         };
 
         function loadFile(){
-            if (!csvFile.files[0]) {
+            if (!csvFile.files[0]){
                 alert("Please select a file");
             }
             else if (csvFile.files[0].name.split(".").pop() !== "csv"){
@@ -181,10 +187,10 @@
                 var allTextLines = allText.split(/\r\n|\n/);
                 var headers = allTextLines[0].split(',');
                 var lines = [];
-                for (var i=1; i<allTextLines.length; i++) {
+                for (var i=1; i<allTextLines.length; i++){
                     var data = allTextLines[i].split(',');
-                    if (data.length == headers.length) {
-                        for (var j=0; j<headers.length; j++) {
+                    if (data.length == headers.length){
+                        for (var j=0; j<headers.length; j++){
                             lines.push(data[j]);
                         }
                     }
@@ -195,7 +201,7 @@
             var input = csvFile.files[0];
             var reader = new FileReader();
     
-            reader.onload = function (e) {
+            reader.onload = function(e){
                 var text = e.target.result;
                 data = csvToArray(text);
                 numAddresses = data.length;
@@ -254,16 +260,66 @@
  
                 var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
                 document.getElementById("satellite").src = newSatellite;
-                var newStreet = "https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=" + lat + "%2C" + long;
-                document.getElementById("street").src = newStreet;
                 var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
                 document.getElementById("map").src = newMap; 
+                updateStreet(lat, long);
             })
         }
 
         function returnAddress(position){
             currentAddress = data[position-1];
             return currentAddress;
+        }
+
+        function updateStreet(lat, long){
+            var panorama;
+            var map;
+
+            function initialize() {
+                var myLatlng = new google.maps.LatLng(lat, long);
+                var sv = new google.maps.StreetViewService();
+                panorama = new google.maps.StreetViewPanorama(document.getElementById("street"));
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: myLatlng,
+                    zoom: 16,
+                    streetViewControl: false
+                });
+
+                sv.getPanorama({
+                    location: myLatlng,
+                    source: google.maps.StreetViewSource.OUTDOOR
+                }, processSVData);
+            }
+
+            function processSVData(data, status) {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    var marker = new google.maps.Marker({
+                        position: data.location.latLng,
+                        map: map,
+                        title: data.location.description
+                    });
+                    panorama.setPano(data.location.pano);
+                    panorama.setPov({
+                        heading: 0,
+                        pitch: 0
+                    });
+                    panorama.setVisible(true);
+                    marker.addListener('click', function() {
+                        var markerPanoID = data.location.pano;
+                        panorama.setPano(markerPanoID);
+                        panorama.setPov({
+                            heading: 270,
+                            pitch: 0
+                        });
+                        panorama.setVisible(true);
+                    });
+                } 
+                else {
+                    console.log('Street View data not found for this location.');
+                }
+            }
+            initialize();
         }
     </script>
 
