@@ -295,16 +295,14 @@
                                 pitch: 0
                             });
                             myStreetView.setVisible(true);
-                            setTimeout(function() {
-                                marker = new google.maps.Marker({
-                                    position: results[0].geometry.location,
-                                    map: myStreetView,
-                                    title: address
-                                });
-                                if (marker && marker.setMap){
-                                    marker.setMap(myStreetView);
-                                }
-                            }, 0);
+                            marker = new google.maps.Marker({
+                                position: results[0].geometry.location,
+                                map: myStreetView,
+                                title: address
+                            });
+                            if (marker && marker.setMap){
+                                marker.setMap(myStreetView);
+                            }
                         });
                     }
                 }
