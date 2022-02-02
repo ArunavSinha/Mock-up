@@ -101,10 +101,6 @@
             margin-top: 10px;
         }
 
-        #map * {
-            overflow: visible;
-        }
-
     </style>
 </head>
 
@@ -122,8 +118,9 @@
             <div>
                 <article3>
                     <p><strong>Street View</strong></p>
-                    <!-- <iframe id="street" width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe> -->
-                    <div id="street" style="width: 100%; height: 253px; border:0; overflow: visible" ></div>
+                    <div id="street">
+                        <iframe width="200%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
+                    </div>
                 </article3>
                 
             </div>
@@ -138,7 +135,7 @@
             <div>
                 <article4>
                     <p><strong>Map View</strong></p>
-                    <iframe id="map" width="99.9%" height="87%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18"></iframe>
+                    <iframe id="map" width="100%" height="87%" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18"></iframe>
                 </article4>
                 <article5>
                     <p style="margin-left: 170px"><strong>Current Address</strong></p>
@@ -164,6 +161,9 @@
         var numAddresses = 1;
         var position = 1;
         var counter = 1;
+        var geocoder = new google.maps.Geocoder();
+        var myStreetView = null;
+        var marker = null;
         var data, currentAddress, lat, long, placeID, formattedAddress;
         var csvFile = document.getElementsByTagName('input')[0];
         
@@ -243,7 +243,7 @@
                         key:'AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE'
                     }
                 })
-                 return promise;
+                return promise;
             }
             catch (error) {
                 console.log(error);
@@ -262,7 +262,7 @@
                 document.getElementById("satellite").src = newSatellite;
                 var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
                 document.getElementById("map").src = newMap; 
-                updateStreet(lat, long);
+                geocodeAddress(formattedAddress);
             })
         }
 
@@ -271,55 +271,47 @@
             return currentAddress;
         }
 
-        function updateStreet(lat, long){
-            var panorama;
-            var map;
+        function geocodeAddress(address) {
+            var sv = new google.maps.StreetViewService();
+            myStreetView = new google.maps.StreetViewPanorama(document.getElementById("street"));
 
-            function initialize() {
-                var myLatlng = new google.maps.LatLng(lat, long);
-                var sv = new google.maps.StreetViewService();
-                panorama = new google.maps.StreetViewPanorama(document.getElementById("street"));
+            geocoder.geocode({
+                "address": address
+            },             
+            function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    myStreetView.setPosition(results[0].geometry.location);
 
-                map = new google.maps.Map(document.getElementById('map'), {
-                    center: myLatlng,
-                    zoom: 16,
-                    streetViewControl: false
-                });
-
-                sv.getPanorama({
-                    location: myLatlng,
-                    source: google.maps.StreetViewSource.OUTDOOR
-                }, processSVData);
-            }
-
-            function processSVData(data, status) {
-                if (status === google.maps.StreetViewStatus.OK) {
-                    var marker = new google.maps.Marker({
-                        position: data.location.latLng,
-                        map: map,
-                        title: data.location.description
-                    });
-                    panorama.setPano(data.location.pano);
-                    panorama.setPov({
-                        heading: 0,
-                        pitch: 0
-                    });
-                    panorama.setVisible(true);
-                    marker.addListener('click', function() {
-                        var markerPanoID = data.location.pano;
-                        panorama.setPano(markerPanoID);
-                        panorama.setPov({
-                            heading: 270,
-                            pitch: 0
+                    sv.getPanorama({
+                        location: results[0].geometry.location,
+                        source: google.maps.StreetViewSource.OUTDOOR
+                    }, processSVData);
+                    function processSVData(data, status) {
+                        google.maps.event.addListenerOnce(myStreetView, "status_changed", function() {
+                            var heading = google.maps.geometry.spherical.computeHeading(myStreetView.getLocation().latLng, results[0].geometry.location);
+                            myStreetView.setPano(data.location.pano);
+                            myStreetView.setPov({
+                                heading: heading,
+                                pitch: 0
+                            });
+                            myStreetView.setVisible(true);
+                            setTimeout(function() {
+                                marker = new google.maps.Marker({
+                                    position: results[0].geometry.location,
+                                    map: myStreetView,
+                                    title: address
+                                });
+                                if (marker && marker.setMap){
+                                    marker.setMap(myStreetView);
+                                }
+                            }, 500);
                         });
-                        panorama.setVisible(true);
-                    });
-                } 
-                else {
-                    console.log('Street View data not found for this location.');
+                    }
                 }
-            }
-            initialize();
+                else {
+                    console.log("Status: " + status);
+                } 
+            });
         }
     </script>
 
