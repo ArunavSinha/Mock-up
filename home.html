@@ -118,8 +118,8 @@
             <div>
                 <article3>
                     <p><strong>Street View</strong></p>
-                    <div id="street">
-                        <iframe width="200%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
+                    <div id="street" style="width:100%; height:253px; border:0">
+                        <iframe width="100%" height="253px" style="border:0" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/streetview?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&location=45.4220%2C-75.7055&heading=170&pitch=16"></iframe>
                     </div>
                 </article3>
                 
@@ -262,7 +262,7 @@
                 document.getElementById("satellite").src = newSatellite;
                 var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
                 document.getElementById("map").src = newMap; 
-                geocodeAddress(formattedAddress);
+                updateStreet(formattedAddress);
             })
         }
 
@@ -271,7 +271,7 @@
             return currentAddress;
         }
 
-        function geocodeAddress(address) {
+        function updateStreet(address) {
             var sv = new google.maps.StreetViewService();
             myStreetView = new google.maps.StreetViewPanorama(document.getElementById("street"));
 
