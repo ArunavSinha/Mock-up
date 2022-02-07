@@ -130,6 +130,8 @@
             <div>
                 <article2>
                     <p><strong>Additional Information</strong></p>
+                    <p style="text-align: left; margin-left: 10px; margin-top: 30px; display: inline-block; text-decoration: underline;">Currently Viewing:</p>
+                    <p style="text-align: left; margin-left: 10px; margin-top: 30px; display: inline-block;" id="userInputted">301 Wellington St, Ottawa, ON K1A 0J1</p>
                 </article2>
             </div>
             <div>
@@ -257,6 +259,7 @@
                 let placeID = response.data.results[0].place_id;
                 let formattedAddress = response.data.results[0].formatted_address;
                 document.getElementById("current").innerHTML = formattedAddress;
+                document.getElementById("userInputted").innerHTML = returnAddress(position);
  
                 var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
                 document.getElementById("satellite").src = newSatellite;
