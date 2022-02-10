@@ -102,6 +102,8 @@
         background-color: #f1f1f1;
         color: black;
         margin-bottom: 5px;
+        margin-right: 10px;
+        margin-left: -5px;
         padding: 5px 10px;
     }
 
@@ -110,6 +112,7 @@
         background-color: #04AA6D;
         color: white;
         padding: 5px 10px;
+        margin-bottom: 5px;
     }
 
     .file-button {
@@ -170,8 +173,10 @@
                     <p class="file-name">No file chosen</p>
                     <input id="file" id = "csvFile" accept=".csv" type="file">
 
-                    <a href="#" class="previous" id="previous" onclick="previous();">&laquo; Previous</a>
-                    <a href="#" class="next" id="next" onclick="next();">Next &raquo;</a>
+                    <div class="btn-group">
+                        <a href="#" class="previous" id="previous" onclick="previous();">Previous &laquo;</a>
+                        <a href="#" class="next" id="next" onclick="next();">Next &raquo;</a>
+                    </div>                    
                 </div>
             </div>
         </div>
