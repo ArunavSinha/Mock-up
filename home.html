@@ -67,7 +67,6 @@
     var csvFile = document.getElementsByTagName('input')[0];
     var infoArea = document.getElementById('file-upload-filename');
     var initAddress = "301 Wellington St, Ottawa, ON K1A 0J1";
-    var markerPlaced = false;
 
     function update(e) {
         fileName.textContent = file.files[0].name;
@@ -177,14 +176,7 @@
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
             
-            updateStreet(formattedAddress).then(
-                (markerPlaced) => {
-                    console.log("Marker placed");
-                },
-                (markerPlaced) => {
-                    console.log("Could not place marker");
-                }
-            );
+            updateStreet(formattedAddress);
         })
     }
 
@@ -197,7 +189,6 @@
         var geocoder = new google.maps.Geocoder();
         var myStreetView = null;
         var marker = null;
-        markerPlaced = false;
 
         var sv = new google.maps.StreetViewService();
         var map = new google.maps.Map(document.getElementById("street"));
@@ -231,7 +222,6 @@
                         if (marker && marker.setMap){
                             marker.setMap(myStreetView);
                         }
-                        markerPlaced = true;
                         myStreetView.setVisible(true);
                         map.setStreetView(myStreetView);
                     });
