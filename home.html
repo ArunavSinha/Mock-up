@@ -11,134 +11,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&callback=initialize" async></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-<style>
-    h3 {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        text-align: center;
-
-    }
-
-    .container {
-        max-width: 1300px;
-    }
-
-    .row {
-        background: #f8f9fa;
-        margin-top: 20px;
-        padding: 5px;
-    }
-
-    .box {
-        border: 2px solid black;
-        margin-bottom: 10px;
-    }
-
-    .SatelliteBox {
-        text-align: center;
-        height: 350px;
-    }
-
-    .StreetBox {
-        text-align: center;
-        height: 250px;
-    }
-
-    .AdditionalBox {
-        height: 120px;
-    }
-
-    .AdditionalBox p {
-        text-align: left;
-        font-size: 14px;
-        display: inline-block;
-    }
-
-    .MapBox {
-        text-align: center;
-        height: 220px;
-        width: 450px;
-    }
-
-    .buttonBox {
-        text-align: center;
-        height: 220px;
-        width: 150px;
-        float: right;
-        margin-top: -230px;
-        border: 0px;
-        font-size: 15px;
-    }
-
-    .currentAddress {
-        text-align: left;
-        font-size: 14px;
-    }
-
-    .buttons {
-        padding: 10px 15px;
-        text-align: center;
-        cursor: pointer;
-        vertical-align: middle;
-        margin-right: 10px;
-        margin-top: 10px;
-    }
-
-    a {
-        text-decoration: none;
-        display: inline-block;
-        padding: 8px 16px;
-    }
-
-    a:hover {
-        background-color: #ddd;
-        color: black;
-    }
-
-    .previous {
-        display: inline-block;
-        background-color: #f1f1f1;
-        color: black;
-        margin-bottom: 5px;
-        margin-right: 10px;
-        margin-left: -5px;
-        padding: 5px 10px;
-    }
-
-    .next {
-        display: inline-block;
-        background-color: #04AA6D;
-        color: white;
-        padding: 5px 10px;
-        margin-bottom: 5px;
-    }
-
-    .file-button {
-        background: #eee;
-        border: 1px solid rgb(78, 77, 77);
-        border-radius: 3px;
-        display: inline-block;
-        padding: 2px 8px;
-    }
-
-    .file-name {
-        width: 120px;
-        overflow-wrap: break-word;
-        margin-top: -5px;
-        padding: 2px;
-    }
-
-    input[type='file'] {
-        display: none;
-    }
-
-</style>
 
 <body>
     <h3>User Interface Mock-Up</h3>
-
     <div class="container">
         <div class="row">
             <div class="col-6">
@@ -155,6 +32,7 @@
                     <p id="current" class="currentAddress">301 Wellington St, Ottawa, ON K1A 0J1</p>
                 </div>
             </div>
+
             <div class="col-6">
                 <div class="col-12 box StreetBox"><strong>Street View</strong>
                     <div id="street"></div>
@@ -166,13 +44,11 @@
                 <div class="col-12 box buttonBox">
                     <p><strong>Viewing Address</strong></p>
                     <p id="position" style="line-height: 0.5; margin-bottom: 25px;">1/1</p>
-
                     <label class="file-label" for="file">
                         <div class="file-button">Choose File</div>
                     </label>
                     <p class="file-name">No file chosen</p>
                     <input id="file" id = "csvFile" accept=".csv" type="file">
-
                     <div class="btn-group">
                         <a href="#" class="previous" id="previous" onclick="previous();">Previous &laquo;</a>
                         <a href="#" class="next" id="next" onclick="next();">Next &raquo;</a>
@@ -191,6 +67,7 @@
     var csvFile = document.getElementsByTagName('input')[0];
     var infoArea = document.getElementById('file-upload-filename');
     var initAddress = "301 Wellington St, Ottawa, ON K1A 0J1";
+    var markerPlaced = false;
 
     function update(e) {
         fileName.textContent = file.files[0].name;
@@ -299,7 +176,15 @@
             document.getElementById("satellite").src = newSatellite;
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
-            updateStreet(formattedAddress);
+            
+            updateStreet(formattedAddress).then(
+                (markerPlaced) => {
+                    console.log("Marker placed");
+                },
+                (markerPlaced) => {
+                    console.log("Could not place marker");
+                }
+            );
         })
     }
 
@@ -312,6 +197,7 @@
         var geocoder = new google.maps.Geocoder();
         var myStreetView = null;
         var marker = null;
+        markerPlaced = false;
 
         var sv = new google.maps.StreetViewService();
         var map = new google.maps.Map(document.getElementById("street"));
@@ -337,15 +223,16 @@
                             heading: heading,
                             pitch: 0
                         });
-                        myStreetView.setVisible(true);
                         marker = new google.maps.Marker({
                             position: results[0].geometry.location,
                             map: myStreetView,
-                            title: "test"
+                            title: address
                         });
                         if (marker && marker.setMap){
                             marker.setMap(myStreetView);
                         }
+                        markerPlaced = true;
+                        myStreetView.setVisible(true);
                         map.setStreetView(myStreetView);
                     });
                 }
@@ -357,6 +244,5 @@
         });
     }
 </script>
-
 
 </html>
