@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&callback=initialize" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -75,8 +75,10 @@
         fileName = document.querySelector('.file-name');
     file.addEventListener('change', update);
 
+    initialize();
+
     function initialize(){
-        updateMap(initAddress);
+        main(initAddress).catch((error)=>{console.log(error);});
     }
     
     csvFile.onclick = function(){
@@ -118,9 +120,19 @@
             data = csvToArray(text);
             numAddresses = data.length;
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
-            updateMap(returnAddress(position));
+            main(returnAddress(position)).catch((error)=>{console.log(error);});
         };
         reader.readAsText(input);
+    }
+
+    function returnAddress(position){
+        try {
+            currentAddress = data[position-1];
+            return currentAddress;
+        }
+        catch {
+            return initAddress;
+        }
     }
 
     function next(){
@@ -132,7 +144,7 @@
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        updateMap(returnAddress(position));
+        main(returnAddress(position)).catch((error)=>{console.log(error);});
     }
 
     function previous(){
@@ -144,7 +156,30 @@
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        updateMap(returnAddress(position));
+        main(returnAddress(position)).catch((error)=>{console.log(error);});
+    }
+
+    async function main(location){
+        console.log("---------------------");
+        console.log("Before dummy function");
+        await dummy(location);
+        console.log("After dummy function"); // Can't get here
+    }
+
+    function dummy(location){
+        var p = new Promise(function(resolve, reject){
+            console.log("Inside dummy function");
+            result = updateMap(location);
+            try {
+                if (result == true){
+                    resolve(result);
+                }
+            }
+            catch (error) {
+                reject(console.log(error));
+            } 
+        })
+        return p;
     }
 
     function addressToCoordinates(location){
@@ -162,75 +197,75 @@
         }
     }
 
+    function updateStreet(formattedAddress){
+        var geocoder = new google.maps.Geocoder();
+        var marker = null;
+        var sv = new google.maps.StreetViewService();
+        var map = new google.maps.Map(document.getElementById("street"));
+        var myStreetView = new google.maps.StreetViewPanorama(document.getElementById("pano"));
+        var markerPlaced = false;
+
+        console.log("Inside updateStreet function");
+        
+        geocoder.geocode({
+            "address": formattedAddress
+        },             
+        function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                myStreetView.setPosition(results[0].geometry.location);
+                sv.getPanorama({
+                    location: results[0].geometry.location,
+                    source: google.maps.StreetViewSource.OUTDOOR
+                }, processSVData);
+                function processSVData(data, status) {
+                    google.maps.event.addListenerOnce(myStreetView, "status_changed", function() {
+                        var heading = google.maps.geometry.spherical.computeHeading(myStreetView.getLocation().latLng, results[0].geometry.location);
+                        myStreetView.setPano(data.location.pano);
+                        myStreetView.setPov({
+                            heading: heading,
+                            pitch: 0
+                        });
+                        marker = new google.maps.Marker({
+                            position: results[0].geometry.location,
+                            map: myStreetView,
+                            title: formattedAddress
+                        });
+                        if (marker && marker.setMap){
+                            marker.setMap(myStreetView);
+                        }
+                        markerPlaced = true;
+                        console.log("Marker placed"); // Figure out why I sometimes don't get here
+                        myStreetView.setVisible(true);
+                        map.setStreetView(myStreetView);
+                    });
+                }
+            }
+            else {
+                console.log("Status: " + status);
+                markerPlaced = false;
+            } 
+        });
+        return markerPlaced;
+    }
+
     function updateMap(location){
         addressToCoordinates(location).then((response)=>{
             let lat = response.data.results[0].geometry.location.lat;
             let long = response.data.results[0].geometry.location.lng;
             let placeID = response.data.results[0].place_id;
-            let formattedAddress = response.data.results[0].formatted_address;
+            formattedAddress = response.data.results[0].formatted_address;
             document.getElementById("current").innerHTML = formattedAddress;
             document.getElementById("userInputted").innerHTML = returnAddress(position);
-
-            var geocoder = new google.maps.Geocoder();
-            var myStreetView = null;
-            var marker = null;
-            var sv = new google.maps.StreetViewService();
-            var map = new google.maps.Map(document.getElementById("street"));
-            myStreetView = new google.maps.StreetViewPanorama(document.getElementById("pano"));
-            
-            geocoder.geocode({
-                "address": formattedAddress
-            },             
-            function(results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                    myStreetView.setPosition(results[0].geometry.location);
-                    sv.getPanorama({
-                        location: results[0].geometry.location,
-                        source: google.maps.StreetViewSource.OUTDOOR
-                    }, processSVData);
-                    function processSVData(data, status) {
-                        google.maps.event.addListenerOnce(myStreetView, "status_changed", function() {
-                            var heading = google.maps.geometry.spherical.computeHeading(myStreetView.getLocation().latLng, results[0].geometry.location);
-                            myStreetView.setPano(data.location.pano);
-                            myStreetView.setPov({
-                                heading: heading,
-                                pitch: 0
-                            });
-                            marker = new google.maps.Marker({
-                                position: results[0].geometry.location,
-                                map: myStreetView,
-                                title: formattedAddress
-                            });
-                            if (marker && marker.setMap){
-                                marker.setMap(myStreetView);
-                            }
-                            myStreetView.setVisible(true);
-                            map.setStreetView(myStreetView);
-                        });
-                    }
-                }
-                else {
-                    console.log("Status: " + status);
-                } 
-            });
 
             var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
             document.getElementById("satellite").src = newSatellite;
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
+
+            console.log("Inside updateMap function");
+            return updateStreet(formattedAddress);
         })
     }
-
-    function returnAddress(position){
-        try {
-            currentAddress = data[position-1];
-            return currentAddress;
-        }
-        catch {
-            return initAddress;
-        }
-    }
-
 </script>
 
 </html>
