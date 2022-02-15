@@ -63,7 +63,7 @@
     var numAddresses = 1;
     var position = 1;
     var counter = 1;
-    var data, currentAddress, lat, long, placeID, formattedAddress;
+    var data, currentAddress, lat, long, placeID, formattedAddress, markerPlaced;
     var csvFile = document.getElementsByTagName('input')[0];
     var infoArea = document.getElementById('file-upload-filename');
     var initAddress = "249 Wellington St, Ottawa, ON K1A 0J1";
@@ -76,9 +76,8 @@
     file.addEventListener('change', update);
 
     initialize();
-
     function initialize(){
-        main(initAddress).catch((error)=>{console.log(error);});
+        updateMap(initAddress);
     }
     
     csvFile.onclick = function(){
@@ -120,7 +119,8 @@
             data = csvToArray(text);
             numAddresses = data.length;
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
-            main(returnAddress(position)).catch((error)=>{console.log(error);});
+            callFunction().then(result => {});
+            setTimeout(reRun, 1000);
         };
         reader.readAsText(input);
     }
@@ -144,7 +144,8 @@
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        main(returnAddress(position)).catch((error)=>{console.log(error);});
+        callFunction().then(result => {});
+        setTimeout(reRun, 1000);
     }
 
     function previous(){
@@ -156,30 +157,18 @@
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        main(returnAddress(position)).catch((error)=>{console.log(error);});
+        callFunction().then(result => {});
+        setTimeout(reRun, 1000);
     }
 
-    async function main(location){
-        console.log("---------------------");
-        console.log("Before dummy function");
-        await dummy(location);
-        console.log("After dummy function"); // Can't get here
+    function reRun(){
+        if (!markerPlaced){
+            callFunction().then(result => {});
+        }
     }
 
-    function dummy(location){
-        var p = new Promise(function(resolve, reject){
-            console.log("Inside dummy function");
-            result = updateMap(location);
-            try {
-                if (result == true){
-                    resolve(result);
-                }
-            }
-            catch (error) {
-                reject(console.log(error));
-            } 
-        })
-        return p;
+    const callFunction = async () => {
+        return await updateMap(returnAddress(position));
     }
 
     function addressToCoordinates(location){
@@ -203,9 +192,7 @@
         var sv = new google.maps.StreetViewService();
         var map = new google.maps.Map(document.getElementById("street"));
         var myStreetView = new google.maps.StreetViewPanorama(document.getElementById("pano"));
-        var markerPlaced = false;
-
-        console.log("Inside updateStreet function");
+        markerPlaced = false;
         
         geocoder.geocode({
             "address": formattedAddress
@@ -234,14 +221,12 @@
                             marker.setMap(myStreetView);
                         }
                         markerPlaced = true;
-                        console.log("Marker placed"); // Figure out why I sometimes don't get here
                         myStreetView.setVisible(true);
                         map.setStreetView(myStreetView);
                     });
                 }
             }
             else {
-                console.log("Status: " + status);
                 markerPlaced = false;
             } 
         });
@@ -262,7 +247,6 @@
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
 
-            console.log("Inside updateMap function");
             return updateStreet(formattedAddress);
         })
     }
