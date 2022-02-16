@@ -5,14 +5,16 @@ h3 {
 
 }
 
-.container {
-    max-width: 1300px;
+.container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .row {
     background: #f8f9fa;
-    margin-top: 20px;
-    padding: 5px;
+    padding: 0px;
 }
 
 .box {
@@ -31,7 +33,7 @@ h3 {
 }
 
 .AdditionalBox {
-    height: 120px;
+    height: 130px;
 }
 
 .AdditionalBox p {
@@ -42,7 +44,7 @@ h3 {
 
 .MapBox {
     text-align: center;
-    height: 220px;
+    height: 230px;
     width: 450px;
 }
 
@@ -51,7 +53,7 @@ h3 {
     height: 220px;
     width: 150px;
     float: right;
-    margin-top: -230px;
+    margin-top: -235px;
     border: 0px;
     font-size: 15px;
 }
@@ -67,7 +69,6 @@ h3 {
     cursor: pointer;
     vertical-align: middle;
     margin-right: 10px;
-    margin-top: 10px;
 }
 
 a {

@@ -16,11 +16,11 @@
 
 <body>
     <h3>User Interface Mock-Up</h3>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-6">
                 <div class="col-12 box SatelliteBox"><strong>Satellite View</strong>
-                    <iframe id="satellite" width="105.3%" height="93%" style="border:0; margin-left: -15px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
+                    <iframe id="satellite" width="105.2%" height="93%" style="border:0; margin-left: -15px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
                 </div>
                 <div class="col-12 box AdditionalBox">
                     <strong>Additional Information</strong>
@@ -36,7 +36,7 @@
             <div class="col-6">
                 <div class="col-12 box StreetBox"><strong>Street View</strong>
                     <div id="street"></div>
-                    <div id="pano" style="width:105.2%; height:222px; border:0; margin-left: -15px;"></div>
+                    <div id="pano" style="width:105.3%; height:222px; border:0; margin-left: -15px;"></div>
                 </div>
                 <div class="col-12 box MapBox"><strong>Map View</strong>
                     <iframe id="map" width="107.2%" height="89%" style="border:0; margin-left: -15px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18"></iframe>
@@ -45,11 +45,11 @@
                     <p><strong>Viewing Address</strong></p>
                     <p id="position" style="line-height: 0.5; margin-bottom: 25px;">1/1</p>
                     <label class="file-label" for="file">
-                        <div class="file-button">Choose File</div>
+                        <div class="file-button" style="margin-top: 5px;">Choose File</div>
                     </label>
                     <p class="file-name">No file chosen</p>
                     <input id="file" id = "csvFile" accept=".csv" type="file">
-                    <div class="btn-group">
+                    <div class="btn-group" style="margin-top: 10px;">
                         <a href="#" class="previous" id="previous" onclick="previous();">Previous &laquo;</a>
                         <a href="#" class="next" id="next" onclick="next();">Next &raquo;</a>
                     </div>                    
