@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>User Interface Mock-Up</title>
+    <title>Interactive Map Viewer</title>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,12 +15,12 @@
 </head>
 
 <body>
-    <h3>User Interface Mock-Up</h3>
+    <h3>Interactive Map Viewer</h3>
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
                 <div class="col-12 box SatelliteBox"><strong>Satellite View</strong>
-                    <iframe id="satellite" width="105.2%" height="93%" style="border:0; margin-left: -15px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18&maptype=satellite"></iframe>
+                    <div id="satellite" style="width: 105.3%; height: 93%; border: 0; margin-left: -15px;"></div>
                 </div>
                 <div class="col-12 box AdditionalBox">
                     <strong>Additional Information</strong>
@@ -86,6 +86,19 @@
     csvFile.onchange = function(){
         loadFile();
     };
+
+    document.onkeydown = function(e){
+        e = e || window.event;
+        var keycode = e.which || e.keyCode;
+        if(keycode == 74){  // '74' is the keycode for "j"
+            e.preventDefault();
+            previous();
+        }
+        else if (keycode == 76){ // '76' is the keycode for "l"
+            e.preventDefault();
+            next();
+        }
+    }
 
     function loadFile(){
         if (!csvFile.files[0]){
@@ -186,6 +199,52 @@
         }
     }
 
+    function updateMap(location){
+        addressToCoordinates(location).then((response)=>{
+            let lat = response.data.results[0].geometry.location.lat;
+            let long = response.data.results[0].geometry.location.lng;
+            let placeID = response.data.results[0].place_id;
+            formattedAddress = response.data.results[0].formatted_address;
+            document.getElementById("current").innerHTML = formattedAddress;
+            document.getElementById("userInputted").innerHTML = returnAddress(position);
+
+            var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
+            document.getElementById("map").src = newMap; 
+           
+            var result = updateStreet(formattedAddress);
+            updateSatellite(formattedAddress, lat, long);
+
+            return result;
+        })
+    }
+
+    function updateSatellite(formattedAddress, lat, long){
+        var map = new google.maps.Map(document.getElementById("satellite"), {
+            center: {lat: lat, lng: long}, 
+            zoom: 21, 
+            streetViewControl: false,
+            mapTypeId: "satellite",
+        });
+        var marker = new google.maps.Marker({
+            position: {lat: lat, lng: long},
+            title: formattedAddress,
+            map: map,
+        });
+        var contentString = "<p><b>" + formattedAddress + "</b></p>";
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString,
+        });
+
+        marker.addListener("click", () => {
+            infowindow.open({
+                anchor: marker,
+                map,
+                shouldFocus: false,
+            });
+        });
+        marker.click();
+    }
+
     function updateStreet(formattedAddress){
         var geocoder = new google.maps.Geocoder();
         var marker = null;
@@ -231,24 +290,6 @@
             } 
         });
         return markerPlaced;
-    }
-
-    function updateMap(location){
-        addressToCoordinates(location).then((response)=>{
-            let lat = response.data.results[0].geometry.location.lat;
-            let long = response.data.results[0].geometry.location.lng;
-            let placeID = response.data.results[0].place_id;
-            formattedAddress = response.data.results[0].formatted_address;
-            document.getElementById("current").innerHTML = formattedAddress;
-            document.getElementById("userInputted").innerHTML = returnAddress(position);
-
-            var newSatellite = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=21&maptype=satellite";
-            document.getElementById("satellite").src = newSatellite;
-            var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
-            document.getElementById("map").src = newMap; 
-
-            return updateStreet(formattedAddress);
-        })
     }
 </script>
 
