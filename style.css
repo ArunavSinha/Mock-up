@@ -71,6 +71,11 @@ h3 {
     margin-right: 10px;
 }
 
+.pac-container {
+    height: 95px;
+    margin-top: -123px;
+}
+
 a {
     text-decoration: none;
     display: inline-block;

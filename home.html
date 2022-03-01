@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&libraries=places"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -30,6 +30,9 @@
                     <br>
                     <p style="text-decoration: underline;">Formatted Address:</p>
                     <p id="current" class="currentAddress">249 Wellington St, Ottawa, ON K1A 0J1</p>
+                    <br>
+                    <p style="text-decoration: underline; margin-right: 5px;">Manually Enter Address:</p>
+                    <input type="text" id="manual" style="width: 200px; font-size: 14px;" placeholder="Enter the address"></input> 
                 </div>
             </div>
 
@@ -48,7 +51,7 @@
                         <div class="file-button" style="margin-top: 5px;">Choose File</div>
                     </label>
                     <p class="file-name">No file chosen</p>
-                    <input id="file" id = "csvFile" accept=".csv" type="file">
+                    <input id="file" id="csvFile" accept=".csv" type="file">
                     <div class="btn-group" style="margin-top: 10px;">
                         <a href="#" class="previous" id="previous" onclick="previous();">Previous &laquo;</a>
                         <a href="#" class="next" id="next" onclick="next();">Next &raquo;</a>
@@ -64,7 +67,7 @@
     var position = 1;
     var counter = 1;
     var data, currentAddress, lat, long, placeID, formattedAddress, markerPlaced;
-    var csvFile = document.getElementsByTagName('input')[0];
+    var csvFile = document.getElementsByTagName('input')[1];
     var infoArea = document.getElementById('file-upload-filename');
     var initAddress = "249 Wellington St, Ottawa, ON K1A 0J1";
 
@@ -80,6 +83,20 @@
         updateMap(initAddress);
     }
     
+    google.maps.event.addDomListener(window, "load", manualEntry);
+    function manualEntry(){
+        const input = $("#manual").get(0);
+        const options = {
+            componentRestrictions: { country: "ca" }
+        };
+        var gmaps = new google.maps.places.Autocomplete(input, options);
+        google.maps.event.addListener(gmaps, 'place_changed', function () {
+            var location = gmaps.getPlace().formatted_address;
+            updateMap(location);
+            setTimeout(reRun, 1000);
+        });
+    }
+
     csvFile.onclick = function(){
         this.value = null;
     };
@@ -87,18 +104,18 @@
         loadFile();
     };
 
-    document.onkeydown = function(e){
-        e = e || window.event;
-        var keycode = e.which || e.keyCode;
-        if(keycode == 74){  // '74' is the keycode for "j"
-            e.preventDefault();
-            previous();
-        }
-        else if (keycode == 76){ // '76' is the keycode for "l"
-            e.preventDefault();
-            next();
-        }
-    }
+    // document.onkeydown = function(e){
+    //     e = e || window.event;
+    //     var keycode = e.which || e.keyCode;
+    //     if(keycode == 74){  // '74' is the keycode for "j"
+    //         e.preventDefault();
+    //         previous();
+    //     }
+    //     else if (keycode == 76){ // '76' is the keycode for "l"
+    //         e.preventDefault();
+    //         next();
+    //     }
+    // }
 
     function loadFile(){
         if (!csvFile.files[0]){
@@ -206,14 +223,11 @@
             let placeID = response.data.results[0].place_id;
             formattedAddress = response.data.results[0].formatted_address;
             document.getElementById("current").innerHTML = formattedAddress;
-            document.getElementById("userInputted").innerHTML = returnAddress(position);
-
+            document.getElementById("userInputted").innerHTML = location;
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
-           
             var result = updateStreet(formattedAddress);
             updateSatellite(formattedAddress, lat, long);
-
             return result;
         })
     }
@@ -234,7 +248,6 @@
         var infowindow = new google.maps.InfoWindow({
             content: contentString,
         });
-
         marker.addListener("click", () => {
             infowindow.open({
                 anchor: marker,
@@ -242,7 +255,6 @@
                 shouldFocus: false,
             });
         });
-        marker.click();
     }
 
     function updateStreet(formattedAddress){
@@ -252,7 +264,6 @@
         var map = new google.maps.Map(document.getElementById("street"));
         var myStreetView = new google.maps.StreetViewPanorama(document.getElementById("pano"));
         markerPlaced = false;
-        
         geocoder.geocode({
             "address": formattedAddress
         },             
