@@ -19,28 +19,32 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
+                <!-- Satellite View Frame, upper left corner -->
                 <div class="col-12 box SatelliteBox"><strong>Satellite View</strong>
                     <div id="satellite" style="width: 105.3%; height: 93%; border: 0; margin-left: -15px;"></div>
                 </div>
+                <!-- Additional Information Frame, lower left corner -->
                 <div class="col-12 box AdditionalBox">
                     <strong>Additional Information</strong>
                     <br>
                     <p style="text-decoration: underline; margin-top: 10px;">User Inputted Address:</p> 
-                    <p id="userInputted">249 Wellington St, Ottawa, ON K1A 0J1</p>
+                    <p id="userInputted">249 Wellington St, Ottawa, ON K1A 0J1</p> <!-- Setting user inputted address to initial address -->
                     <br>
                     <p style="text-decoration: underline;">Formatted Address:</p>
-                    <p id="current" class="currentAddress">249 Wellington St, Ottawa, ON K1A 0J1</p>
+                    <p id="current" class="currentAddress">249 Wellington St, Ottawa, ON K1A 0J1</p> <!-- Setting formatted address to initial address -->
                     <br>
                     <p style="text-decoration: underline; margin-right: 5px;">Manually Enter Address:</p>
                     <input type="text" id="manual" style="width: 200px; font-size: 14px;" placeholder="Enter the address"></input> 
                 </div>
             </div>
-
+            
             <div class="col-6">
+                <!-- Street View Frame, upper right corner-->
                 <div class="col-12 box StreetBox"><strong>Street View</strong>
                     <div id="street"></div>
                     <div id="pano" style="width:105.3%; height:222px; border:0; margin-left: -15px;"></div>
                 </div>
+                <!-- Map View Frame, lower right corner -->
                 <div class="col-12 box MapBox"><strong>Map View</strong>
                     <iframe id="map" width="107.2%" height="89%" style="border:0; margin-left: -15px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJq0KHTFYEzkwRvbPlVjh1VnI&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=18"></iframe>
                 </div>
@@ -65,38 +69,39 @@
 <script>
     var numAddresses = 1;
     var position = 1;
-    var counter = 1;
     var data, currentAddress, lat, long, placeID, formattedAddress, markerPlaced;
-    var csvFile = document.getElementsByTagName('input')[1];
-    var infoArea = document.getElementById('file-upload-filename');
+    var csvFile = document.getElementsByTagName('input')[1]; // get value from 2nd HTML input tag (id = "csvFile") 
     var initAddress = "249 Wellington St, Ottawa, ON K1A 0J1";
 
+    // File upload using "Choose File" button
     function update(e) {
         fileName.textContent = file.files[0].name;
     }
     const file = document.querySelector('#file'),
         fileName = document.querySelector('.file-name');
-    file.addEventListener('change', update);
+    file.addEventListener('change', update); // call update function on file change
 
+    // On load, set maps to display initial address
     initialize();
     function initialize(){
-        updateMap(initAddress);
+        updateMaps(initAddress);
     }
     
-    google.maps.event.addDomListener(window, "load", manualEntry);
+    google.maps.event.addDomListener(window, "load", manualEntry); // On load, call manualEntry()
     function manualEntry(){
-        const input = $("#manual").get(0);
+        const input = $("#manual").get(0); // Get user inputted address from text-field
         const options = {
-            componentRestrictions: { country: "ca" }
+            componentRestrictions: { country: "ca" } // Restrict autocomplete suggestions to Canadian addresses only
         };
         var gmaps = new google.maps.places.Autocomplete(input, options);
-        google.maps.event.addListener(gmaps, 'place_changed', function () {
+        google.maps.event.addListener(gmaps, 'place_changed', function () { // if user selects from list, call updateMaps()
             var location = gmaps.getPlace().formatted_address;
-            updateMap(location);
-            setTimeout(reRun, 1000);
+            updateMaps(location);
+            setTimeout(reRun, 1000); // re-run updateStreet function if the street view marker is NOT placed after 1 second
         });
     }
 
+    // Ensures loadFile() is called AFTER file is chosen
     csvFile.onclick = function(){
         this.value = null;
     };
@@ -104,6 +109,7 @@
         loadFile();
     };
 
+    // KEYBOARD SHORTCUTS: 'j' = previous() and 'l' = next()
     // document.onkeydown = function(e){
     //     e = e || window.event;
     //     var keycode = e.which || e.keyCode;
@@ -118,14 +124,17 @@
     // }
 
     function loadFile(){
+        // Double-checking file was selected
         if (!csvFile.files[0]){
-            alert("Please select a file");
+            alert("Please select a file"); 
         }
+        // Ensuring file is of type "csv"
         else if (csvFile.files[0].name.split(".").pop() !== "csv"){
             csvFile = null;
             alert("The file must be of type 'csv'");
         }  
 
+        // Converting csvFile into array, later stored in 'data' variable
         function csvToArray(allText) {
             var allTextLines = allText.split(/\r\n|\n/);
             var headers = allTextLines[0].split(',');
@@ -149,12 +158,13 @@
             data = csvToArray(text);
             numAddresses = data.length;
             document.getElementById("position").innerHTML = position + "/" + numAddresses;
-            callFunction().then(result => {});
-            setTimeout(reRun, 1000);
+            updateMaps(returnAddress(position));
+            setTimeout(reRun, 1000); // re-run updateStreet function if the street view marker is NOT placed after 1 second
         };
         reader.readAsText(input);
     }
 
+    // try to return the user-inputted address at a position in the data array, otherwise return the initial address  
     function returnAddress(position){
         try {
             currentAddress = data[position-1];
@@ -165,42 +175,46 @@
         }
     }
 
+    // Go to the next address in the data array
     function next(){
+        // Ensuring file was selected
         if (!csvFile.files[0]) {
             alert("Please choose a file before clicking 'Next'");
         }
+        // Prevents indexOutOfBounds error by incrementing position only IF we're not already at the end of the array
         if (position < numAddresses){
             position++;
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        callFunction().then(result => {});
-        setTimeout(reRun, 1000);
+        updateMaps(returnAddress(position));
+        setTimeout(reRun, 1000); // re-run updateStreet function if the street view marker is NOT placed after 1 second
     }
 
+    // Go to the previous address in the data array
     function previous(){
+        // Ensuring file was selected
         if (!csvFile.files[0]) {
             alert("Please choose a file before clicking 'Previous'");
         }
+        // Prevents indexOutOfBounds error by decrementing position only IF we're not already at the start of the array
         if (position > 1){
             position--;
             currentAddress = data[position-1];
         }
         document.getElementById("position").innerHTML = position + "/" + numAddresses;
-        callFunction().then(result => {});
-        setTimeout(reRun, 1000);
+        updateMaps(returnAddress(position));
+        setTimeout(reRun, 1000); // re-run updateStreet function if the street view marker is NOT placed after 1 second
     }
 
+    // Used to re-run the updateStreet function if the marker was NOT placed
     function reRun(){
         if (!markerPlaced){
             updateStreet(formattedAddress);
         }
     }
 
-    const callFunction = async () => {
-        return await updateMap(returnAddress(position));
-    }
-
+    // Creates JavaScript promise that ensures the function receieves a response from the Google GeoCoding API
     function addressToCoordinates(location){
         try {
             const promise = axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
@@ -216,7 +230,9 @@
         }
     }
 
-    function updateMap(location){
+    // Updates Maps with location specified
+    function updateMaps(location){
+        // Response from the GeoCoding API is used to retrieve the longitude, latitude, placeID, and formatted address
         addressToCoordinates(location).then((response)=>{
             let lat = response.data.results[0].geometry.location.lat;
             let long = response.data.results[0].geometry.location.lng;
@@ -224,30 +240,37 @@
             formattedAddress = response.data.results[0].formatted_address;
             document.getElementById("current").innerHTML = formattedAddress;
             document.getElementById("userInputted").innerHTML = location;
+
+            // Updating Map frame with new location (lower right corner)
             var newMap = "https://www.google.com/maps/embed/v1/place?q=place_id:" + placeID + "&key=AIzaSyCIF_zp9VV0GYMv-G83OVHa-NdVKsK5GJE&zoom=19";
             document.getElementById("map").src = newMap; 
-            var result = updateStreet(formattedAddress);
+
+            var result = updateStreet(formattedAddress); // stores boolean value that determines if the marker was placed
             updateSatellite(formattedAddress, lat, long);
             return result;
         })
     }
 
+    // Updates satellite view (upper left corner)
     function updateSatellite(formattedAddress, lat, long){
+        // Setting map to new location using longitude and latitude coordinates
         var map = new google.maps.Map(document.getElementById("satellite"), {
             center: {lat: lat, lng: long}, 
             zoom: 21, 
             streetViewControl: false,
             mapTypeId: "satellite",
         });
+        // Placing marker on exact location
         var marker = new google.maps.Marker({
             position: {lat: lat, lng: long},
             title: formattedAddress,
             map: map,
         });
-        var contentString = "<p><b>" + formattedAddress + "</b></p>";
-        var infowindow = new google.maps.InfoWindow({
+        var contentString = "<p><b>" + formattedAddress + "</b></p>"; // Store formatted address into HTML variable
+        var infowindow = new google.maps.InfoWindow({ 
             content: contentString,
         });
+        // Display formatted address in InfoWindow IF marker is clicked
         marker.addListener("click", () => {
             infowindow.open({
                 anchor: marker,
@@ -257,6 +280,9 @@
         });
     }
 
+    // Updates street view (upper right corner)
+    // See Google StreetView API documentation (linked below) for examples
+    // https://developers.google.com/maps/documentation/javascript/streetview#maps_streetview_simple-javascript
     function updateStreet(formattedAddress){
         var geocoder = new google.maps.Geocoder();
         var marker = null;
@@ -268,20 +294,24 @@
             "address": formattedAddress
         },             
         function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
+            // Updates street view frame IF street view of this location is supported by Google 
+            if (status == google.maps.GeocoderStatus.OK) { 
                 myStreetView.setPosition(results[0].geometry.location);
                 sv.getPanorama({
                     location: results[0].geometry.location,
-                    source: google.maps.StreetViewSource.OUTDOOR
+                    source: google.maps.StreetViewSource.OUTDOOR // limits street view source to outdoor maps only, no indoor tours
                 }, processSVData);
                 function processSVData(data, status) {
+                    // Waits for street view map to change location
                     google.maps.event.addListenerOnce(myStreetView, "status_changed", function() {
+                        // Set's the street view rotation to face the location, instead of facing direction of Google Maps car
                         var heading = google.maps.geometry.spherical.computeHeading(myStreetView.getLocation().latLng, results[0].geometry.location);
                         myStreetView.setPano(data.location.pano);
                         myStreetView.setPov({
                             heading: heading,
                             pitch: 0
                         });
+                        // Places a marker on the the exact location
                         marker = new google.maps.Marker({
                             position: results[0].geometry.location,
                             map: myStreetView,
